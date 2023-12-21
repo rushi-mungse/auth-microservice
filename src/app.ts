@@ -1,11 +1,14 @@
 import "reflect-metadata";
 import express from "express";
 import { errorHandlerMiddleware } from "./middlewares";
+import { authRouter } from "./routes";
 
 const app = express();
 
 app.use(express.static("public"));
 app.use(express.json());
+
+app.use("/api/auth", authRouter);
 
 app.use(errorHandlerMiddleware);
 
