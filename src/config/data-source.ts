@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import { User } from "../entity/User";
+import { Token, User } from "../entity";
 import { DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USERNAME } from "./";
 
 export default new DataSource({
@@ -12,7 +12,7 @@ export default new DataSource({
     database: DB_NAME,
     synchronize: true,
     logging: false,
-    entities: [User],
+    entities: [User, Token],
     migrations: [],
     subscribers: [],
 });
