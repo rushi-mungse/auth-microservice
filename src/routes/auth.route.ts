@@ -1,3 +1,4 @@
+import { IAuthRequest } from "./../types/index";
 import express, {
     NextFunction,
     Request,
@@ -9,6 +10,7 @@ import { sendOtpDataValidator, verifyOtpDataValidator } from "../validators";
 import { AppDataSource, logger } from "../config";
 import { Token, User } from "../entity";
 import { CredentialService, TokenService, UserService } from "../services";
+import { checkAccessToken, checkRefreshToken } from "../middlewares";
 const router = express.Router();
 
 /* Dependancy Injection */
@@ -38,6 +40,28 @@ router.post(
     verifyOtpDataValidator,
     (req: Request, res: Response, next: NextFunction) =>
         authController.verifyOtp(req, res, next) as unknown as RequestHandler,
+);
+
+router.get(
+    "/self",
+    [checkAccessToken],
+    (req: Request, res: Response, next: NextFunction) =>
+        authController.self(
+            req as IAuthRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler,
+);
+
+router.get(
+    "/logout",
+    [checkAccessToken, checkRefreshToken],
+    (req: Request, res: Response, next: NextFunction) =>
+        authController.logout(
+            req as IAuthRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler,
 );
 
 export default router;
