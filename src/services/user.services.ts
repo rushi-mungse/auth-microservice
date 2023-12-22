@@ -7,12 +7,36 @@ class UserService {
 
     /* find user by email */
     async findUserByEmail(email: string) {
-        return await this.userRepository.findOne({ where: { email } });
+        return await this.userRepository.findOne({
+            where: { email },
+            select: [
+                "id",
+                "fullName",
+                "email",
+                "phoneNumber",
+                "role",
+                "avatar",
+            ],
+        });
     }
 
     /* create user */
     async saveUser(userData: IUserData) {
         return await this.userRepository.save(userData);
+    }
+
+    async findUserById(userId: number) {
+        return await this.userRepository.findOne({
+            where: { id: userId },
+            select: [
+                "id",
+                "fullName",
+                "email",
+                "avatar",
+                "phoneNumber",
+                "role",
+            ],
+        });
     }
 }
 
