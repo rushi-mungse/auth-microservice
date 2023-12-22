@@ -36,3 +36,12 @@ export type TPayload = JwtPayload & {
     role: string;
     tokenId?: string;
 };
+
+export interface IAuthCookie {
+    accessToken: string;
+    refreshToken: string;
+}
+
+export interface IAuthRequest extends Request {
+    auth: TPayload;
+}
