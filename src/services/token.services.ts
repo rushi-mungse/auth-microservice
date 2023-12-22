@@ -42,6 +42,10 @@ class TokenService {
         const expiresAt = new Date(Date.now() + MS_IN_YEAR);
         return await this.tokenRepository.save({ user: userData, expiresAt });
     }
+
+    async deleteToken(tokenId: number) {
+        await this.tokenRepository.delete(tokenId);
+    }
 }
 
 export default TokenService;
