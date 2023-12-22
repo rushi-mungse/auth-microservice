@@ -16,6 +16,7 @@ export const {
     DB_NAME,
     PRIVATE_KEY,
     REFRESH_TOKEN_SECRET,
+    JWKS_URI,
 } = process.env;
 
 export { default as logger } from "./logger";
