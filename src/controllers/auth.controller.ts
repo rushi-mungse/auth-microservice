@@ -1,7 +1,12 @@
 import { Response, NextFunction } from "express";
 import { validationResult } from "express-validator";
 import { CredentialService, TokenService, UserService } from "../services";
-import { ISendOtpRequestData, IVerifyOtpRequestData, TPayload } from "../types";
+import {
+    IAuthRequest,
+    ISendOtpRequestData,
+    IVerifyOtpRequestData,
+    TPayload,
+} from "../types";
 import { Logger } from "winston";
 import createHttpError from "http-errors";
 import { Role } from "../constants";
@@ -183,6 +188,32 @@ class AuthController {
         }
 
         return res.json(user);
+    }
+
+    async self(req: IAuthRequest, res: Response, next: NextFunction) {
+        const userId = req.auth.userId;
+        try {
+            const user = await this.userService.findUserById(Number(userId));
+            if (!user) return next(createHttpError(400, "User not found!"));
+            res.json(user);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async logout(req: IAuthRequest, res: Response, next: NextFunction) {
+        const tokenId = Number(req.auth.tokenId);
+        try {
+            await this.tokenService.deleteToken(Number(tokenId));
+            res.clearCookie("accessToken");
+            res.clearCookie("refreshToken");
+            res.json({
+                user: null,
+                message: "User successfully logout.",
+            });
+        } catch (error) {
+            next(error);
+        }
     }
 }
 
