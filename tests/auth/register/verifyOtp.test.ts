@@ -5,7 +5,7 @@ import app from "../../../src/app";
 import { Token, User } from "../../../src/entity";
 import { Role } from "./../../../src/constants";
 import { IUserData } from "../../../src/types";
-import { isJWT } from "../../utils";
+import { getTokens, isJWT } from "../../utils";
 
 describe("POST:auth/register/verify-otp", () => {
     let connection: DataSource;
@@ -217,21 +217,9 @@ describe("POST:auth/register/verify-otp", () => {
                 .post("/api/auth/register/verify-otp")
                 .send(sendOtpResponse.body);
 
-            let accessToken: string | null = null;
-            let refreshToken: string | null = null;
-
-            const cookies =
-                (verifyOtpResponse.headers as Record<string, any>)[
-                    "set-cookie"
-                ] || [];
-
-            cookies.forEach((cookie: string) => {
-                if (cookie.startsWith("accessToken"))
-                    accessToken = cookie.split(";")[0].split("=")[1];
-
-                if (cookie.startsWith("refreshToken"))
-                    refreshToken = cookie.split(";")[0].split("=")[1];
-            });
+            const { accessToken, refreshToken } = getTokens(
+                verifyOtpResponse as unknown as Response,
+            );
 
             expect(accessToken).not.toBeNull();
             expect(refreshToken).not.toBeNull();
