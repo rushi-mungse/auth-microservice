@@ -1,5 +1,5 @@
 import { Repository } from "typeorm";
-import { sign } from "jsonwebtoken";
+import { sign, verify } from "jsonwebtoken";
 import { TPayload } from "../types";
 import { Token, User } from "../entity";
 import { PRIVATE_KEY, REFRESH_TOKEN_SECRET } from "../config";
@@ -45,6 +45,12 @@ class TokenService {
 
     async deleteToken(tokenId: number) {
         await this.tokenRepository.delete(tokenId);
+    }
+
+    verifyRefreshToken(refreshToken: string) {
+        if (!REFRESH_TOKEN_SECRET)
+            throw createHttpError(500, "SECRET_HASH is not found!");
+        return verify(refreshToken, REFRESH_TOKEN_SECRET);
     }
 }
 
