@@ -45,3 +45,12 @@ export interface IAuthCookie {
 export interface IAuthRequest extends Request {
     auth: TPayload;
 }
+
+export interface ILoginData {
+    email: string;
+    password: string;
+}
+
+export interface ILoginRequest extends Request {
+    body: ILoginData;
+}
