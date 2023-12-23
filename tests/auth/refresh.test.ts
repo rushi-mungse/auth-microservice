@@ -8,7 +8,7 @@ import { Role } from "../../src/constants";
 import { Token } from "../../src/entity";
 import { TokenService } from "../../src/services";
 
-describe("POST:auth/register/verify-otp", () => {
+describe("GET:auth/refresh", () => {
     let connection: DataSource;
     let jwt: ReturnType<typeof createJWKSMock>;
 

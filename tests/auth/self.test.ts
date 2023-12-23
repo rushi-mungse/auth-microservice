@@ -6,7 +6,7 @@ import { getTokens } from "../utils";
 import createJWKSMock from "mock-jwks";
 import { Role } from "../../src/constants";
 
-describe("POST:auth/register/verify-otp", () => {
+describe("GET:auth/self", () => {
     let connection: DataSource;
     let jwt: ReturnType<typeof createJWKSMock>;
 
