@@ -54,3 +54,13 @@ export interface ILoginData {
 export interface ILoginRequest extends Request {
     body: ILoginData;
 }
+
+export interface IForgetPasswordRequest {
+    body: {
+        email: string;
+    };
+}
+
+export interface ISetPasswordRequest {
+    body: IVerifyOtpData & { password: string; confirmPassword: string };
+}
