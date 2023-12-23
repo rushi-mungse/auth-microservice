@@ -3,8 +3,10 @@ import { validationResult } from "express-validator";
 import { CredentialService, TokenService, UserService } from "../services";
 import {
     IAuthRequest,
+    IForgetPasswordRequest,
     ILoginRequest,
     ISendOtpRequestData,
+    ISetPasswordRequest,
     IVerifyOtpRequestData,
     TPayload,
 } from "../types";
@@ -341,6 +343,121 @@ class AuthController {
         }
 
         return res.json({ ...user, password: null });
+    }
+
+    async forgetPassword(
+        req: IForgetPasswordRequest,
+        res: Response,
+        next: NextFunction,
+    ) {
+        const { email } = req.body;
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+            return res.status(400).json({ error: result.array() });
+        }
+
+        let user;
+        try {
+            user = await this.userService.findUserByEmail(email);
+            if (!user) {
+                return next(
+                    createHttpError(400, "This email is not registered!"),
+                );
+            }
+        } catch (error) {
+            return next(error);
+        }
+
+        try {
+            const ttl = 1000 * 60 * 10;
+            const expires = Date.now() + ttl;
+            const otp = this.credentialService.generateOtp();
+
+            // TODO: make notification webhook for send otp for user by email
+
+            const prepareDataForHash = `${otp}.${email}.${expires}`;
+            const hashOtpData =
+                this.credentialService.hashDataUsingCrypto(prepareDataForHash);
+
+            const hashOtp = `${hashOtpData}#${expires}`;
+
+            // FIXME: remove otp from res
+
+            return res.json({ fullName: user.fullName, email, hashOtp, otp });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async setPassword(
+        req: ISetPasswordRequest,
+        res: Response,
+        next: NextFunction,
+    ) {
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+            return res.status(400).json({ error: result.array() });
+        }
+
+        const { email, hashOtp, otp, password, confirmPassword, fullName } =
+            req.body;
+
+        // check comfirm password and password is match
+        if (password !== confirmPassword) {
+            const err = createHttpError(
+                400,
+                "confirm password not match to password!",
+            );
+            return next(err);
+        }
+
+        let user;
+        try {
+            user = await this.userService.findUserByEmail(email);
+            if (!user) {
+                return next(
+                    createHttpError(400, "This email is not registered!"),
+                );
+            }
+        } catch (error) {
+            return next(error);
+        }
+
+        // check hash otp is valid
+        if (hashOtp.split("#").length !== 2) {
+            const error = createHttpError(400, "Otp is invalid!");
+            return next(error);
+        }
+
+        // verify otp and hash otp
+        const [prevHashedOtp, expires] = hashOtp.split("#");
+
+        try {
+            if (Date.now() > +expires) {
+                const error = createHttpError(408, "Otp is expired!");
+                return next(error);
+            }
+
+            // prepare hash data
+            const data = `${otp}.${email}.${expires}`;
+            const hashData = this.credentialService.hashDataUsingCrypto(data);
+
+            if (hashData !== prevHashedOtp) {
+                const error = createHttpError(400, "Otp is invalid!");
+                return next(error);
+            }
+        } catch (error) {
+            return next(error);
+        }
+
+        try {
+            const hashPassword =
+                await this.credentialService.hashDataUsingBcrypt(password);
+            await this.userService.updateUserPassword(user.id, hashPassword);
+            res.json(user);
+        } catch (error) {
+            return next(error);
+        }
     }
 }
 
