@@ -1,24 +1,36 @@
-import { IAuthRequest, ILoginRequest } from "./../types/index";
 import express, {
     NextFunction,
     Request,
     RequestHandler,
     Response,
 } from "express";
+
+import {
+    IAuthRequest,
+    IForgetPasswordRequest,
+    ILoginRequest,
+    ISetPasswordRequest,
+} from "./../types";
+
 import { AuthController } from "../controllers";
 import {
+    forgetPasswordDataValidator,
     loginDataValidator,
     sendOtpDataValidator,
+    setPasswordDataValidator,
     verifyOtpDataValidator,
 } from "../validators";
-import { AppDataSource, logger } from "../config";
-import { Token, User } from "../entity";
-import { CredentialService, TokenService, UserService } from "../services";
+
 import {
     checkAccessToken,
     checkRefreshToken,
     isInvalidRefreshToken,
 } from "../middlewares";
+
+import { AppDataSource, logger } from "../config";
+import { Token, User } from "../entity";
+import { CredentialService, TokenService, UserService } from "../services";
+
 const router = express.Router();
 
 /* Dependancy Injection */
@@ -85,6 +97,28 @@ router.get(
     (req: Request, res: Response, next: NextFunction) =>
         authController.refresh(
             req as IAuthRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler,
+);
+
+router.post(
+    "/forget-password",
+    forgetPasswordDataValidator,
+    (req: Request, res: Response, next: NextFunction) =>
+        authController.forgetPassword(
+            req as IForgetPasswordRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler,
+);
+
+router.post(
+    "/set-password",
+    setPasswordDataValidator,
+    (req: Request, res: Response, next: NextFunction) =>
+        authController.setPassword(
+            req as ISetPasswordRequest,
             res,
             next,
         ) as unknown as RequestHandler,
