@@ -1,4 +1,4 @@
-import { IAuthRequest } from "./../types/index";
+import { IAuthRequest, ILoginRequest } from "./../types/index";
 import express, {
     NextFunction,
     Request,
@@ -6,11 +6,19 @@ import express, {
     Response,
 } from "express";
 import { AuthController } from "../controllers";
-import { sendOtpDataValidator, verifyOtpDataValidator } from "../validators";
+import {
+    loginDataValidator,
+    sendOtpDataValidator,
+    verifyOtpDataValidator,
+} from "../validators";
 import { AppDataSource, logger } from "../config";
 import { Token, User } from "../entity";
 import { CredentialService, TokenService, UserService } from "../services";
-import { checkAccessToken, checkRefreshToken } from "../middlewares";
+import {
+    checkAccessToken,
+    checkRefreshToken,
+    isInvalidRefreshToken,
+} from "../middlewares";
 const router = express.Router();
 
 /* Dependancy Injection */
@@ -62,6 +70,13 @@ router.get(
             res,
             next,
         ) as unknown as RequestHandler,
+);
+
+router.post(
+    "/login",
+    [loginDataValidator as unknown as RequestHandler, isInvalidRefreshToken],
+    (req: ILoginRequest, res: Response, next: NextFunction) =>
+        authController.login(req, res, next) as unknown as RequestHandler,
 );
 
 export default router;
