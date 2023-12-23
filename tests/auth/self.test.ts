@@ -158,38 +158,6 @@ describe("POST:auth/register/verify-otp", () => {
             expect(selfResponse.body).toHaveProperty("id");
         });
 
-        it("should return user data with id", async () => {
-            // arrange
-            const sendOtpData = {
-                fullName: "Jon Doe",
-                email: "jon.doe@gmail.com",
-                password: "secret@password",
-                confirmPassword: "secret@password",
-            };
-
-            const sendOtpResponse = await request(app)
-                .post("/api/auth/register/send-otp")
-                .send(sendOtpData);
-
-            await request(app)
-                .post("/api/auth/register/verify-otp")
-                .send(sendOtpResponse.body);
-
-            // arrage
-            const accessToken = jwt.token({
-                userId: 1,
-                role: Role.CUSTOMER,
-            });
-
-            // act
-            const selfResponse = await request(app)
-                .get("/api/auth/self")
-                .set("Cookie", [`accessToken=${accessToken}`]);
-
-            // assert
-            expect(selfResponse.body).toHaveProperty("id");
-        });
-
         it("should return 400 status code if user not found", async () => {
             // arrage
             const accessToken = jwt.token({
