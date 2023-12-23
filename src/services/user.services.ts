@@ -38,6 +38,21 @@ class UserService {
             ],
         });
     }
+
+    async findUserByEmailWithPassword(email: string) {
+        return await this.userRepository.findOne({
+            where: { email },
+            select: [
+                "id",
+                "fullName",
+                "email",
+                "phoneNumber",
+                "role",
+                "avatar",
+                "password",
+            ],
+        });
+    }
 }
 
 export default UserService;
