@@ -1,6 +1,7 @@
 import { User } from "../entity";
 import { Repository } from "typeorm";
 import { IUserData } from "../types";
+import createHttpError from "http-errors";
 
 class UserService {
     constructor(private userRepository: Repository<User>) {}
@@ -51,6 +52,12 @@ class UserService {
                 "avatar",
                 "password",
             ],
+        });
+    }
+
+    async updateUserPassword(userId: number, hashPassword: string) {
+        await this.userRepository.update(userId, {
+            password: hashPassword,
         });
     }
 }
