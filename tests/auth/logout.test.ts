@@ -182,5 +182,50 @@ describe("POST:auth/register/verify-otp", () => {
             // assert
             expect(logoutResponse.body.user).toBeNull();
         });
+
+        it("should persist token in database", async () => {
+            // arrange
+            const sendOtpData = {
+                fullName: "Jon Doe",
+                email: "jon.doe@gmail.com",
+                password: "secret@password",
+                confirmPassword: "secret@password",
+            };
+
+            const sendOtpResponse = await request(app)
+                .post("/api/auth/register/send-otp")
+                .send(sendOtpData);
+
+            await request(app)
+                .post("/api/auth/register/verify-otp")
+                .send(sendOtpResponse.body);
+
+            // arrage
+            const accessToken = jwt.token({
+                userId: 1,
+                role: Role.CUSTOMER,
+            });
+
+            const tokenRepository = connection.getRepository(Token);
+            const refreshToken = new TokenService(
+                tokenRepository,
+            ).signRefreshToken({
+                userId: "1",
+                role: Role.CUSTOMER,
+                tokenId: "1",
+            });
+
+            // act
+            await request(app)
+                .get("/api/auth/logout")
+                .set("Cookie", [
+                    `accessToken=${accessToken}`,
+                    `refreshToken=${refreshToken}`,
+                ]);
+
+            // assert
+            const tokens = await tokenRepository.find();
+            expect(tokens).toHaveLength(0);
+        });
     });
 });
