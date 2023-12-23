@@ -3,6 +3,7 @@ import { validationResult } from "express-validator";
 import { CredentialService, TokenService, UserService } from "../services";
 import {
     IAuthRequest,
+    ILoginRequest,
     ISendOtpRequestData,
     IVerifyOtpRequestData,
     TPayload,
@@ -214,6 +215,77 @@ class AuthController {
         } catch (error) {
             next(error);
         }
+    }
+
+    async login(req: ILoginRequest, res: Response, next: NextFunction) {
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+            return res.status(400).json({ error: result.array() });
+        }
+
+        const { email, password } = req.body;
+        let user;
+        try {
+            user = await this.userService.findUserByEmailWithPassword(email);
+            if (!user) {
+                return next(
+                    createHttpError(400, "Email or Password does not match!"),
+                );
+            }
+        } catch (error) {
+            return next(error);
+        }
+        try {
+            const isMatch = await this.credentialService.hashCompare(
+                password,
+                user.password,
+            );
+
+            if (!isMatch)
+                return next(
+                    createHttpError(400, "Email or Password does not match!"),
+                );
+        } catch (error) {
+            return next(error);
+        }
+
+        // create cookies
+        try {
+            const payload: TPayload = {
+                userId: String(user.id),
+                role: user.role,
+            };
+
+            /* sign access token */
+            const accessToken = this.tokenService.signAccessToken(payload);
+
+            /* save refresh token with user */
+            const tokenRef = await this.tokenService.saveRefreshToken(user);
+
+            /* sign refresh token */
+            const refreshToken = this.tokenService.signRefreshToken({
+                ...payload,
+                tokenId: String(tokenRef.id),
+            });
+
+            res.cookie("accessToken", accessToken, {
+                domain: "localhost",
+                sameSite: "strict",
+                httpOnly: true,
+                maxAge: 1000 * 60 * 60 * 24 /* 24 hourse */,
+            });
+
+            res.cookie("refreshToken", refreshToken, {
+                domain: "localhost",
+                sameSite: "strict",
+                httpOnly: true,
+                maxAge: 1000 * 60 * 60 * 24 * 365 /* 1 year */,
+            });
+        } catch (error) {
+            return next(error);
+        }
+
+        return res.json({ ...user, password: null });
     }
 }
 
