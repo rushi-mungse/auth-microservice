@@ -79,4 +79,15 @@ router.post(
         authController.login(req, res, next) as unknown as RequestHandler,
 );
 
+router.get(
+    "/refresh",
+    [checkRefreshToken],
+    (req: Request, res: Response, next: NextFunction) =>
+        authController.refresh(
+            req as IAuthRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler,
+);
+
 export default router;
