@@ -25,11 +25,13 @@ import {
     checkAccessToken,
     checkRefreshToken,
     isInvalidRefreshToken,
+    permissionMiddleware,
 } from "../middlewares";
 
 import { AppDataSource, logger } from "../config";
 import { Token, User } from "../entity";
 import { CredentialService, TokenService, UserService } from "../services";
+import { Role } from "../constants";
 
 const router = express.Router();
 
@@ -119,6 +121,17 @@ router.post(
     (req: Request, res: Response, next: NextFunction) =>
         authController.setPassword(
             req as ISetPasswordRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler,
+);
+
+router.get(
+    "/permission",
+    [checkAccessToken, permissionMiddleware([Role.ADMIN])],
+    (req: Request, res: Response, next: NextFunction) =>
+        authController.permission(
+            req as IAuthRequest,
             res,
             next,
         ) as unknown as RequestHandler,
