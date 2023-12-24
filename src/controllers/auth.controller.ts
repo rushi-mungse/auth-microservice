@@ -459,6 +459,19 @@ class AuthController {
             return next(error);
         }
     }
+
+    async permission(req: IAuthRequest, res: Response, next: NextFunction) {
+        const auth = req.auth;
+        try {
+            const user = await this.userService.findUserById(
+                Number(auth.userId),
+            );
+            if (!user) return next(createHttpError(400, "User not found!"));
+            return res.json({ permission: true, user });
+        } catch (error) {
+            return next(error);
+        }
+    }
 }
 
 export default AuthController;
