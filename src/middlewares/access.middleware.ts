@@ -1,4 +1,4 @@
-import { Request, RequestHandler } from "express";
+import { Request } from "express";
 import { GetVerificationKey, expressjwt } from "express-jwt";
 import jwksClient from "jwks-rsa";
 import { IAuthCookie } from "../types";
