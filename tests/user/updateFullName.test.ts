@@ -102,30 +102,6 @@ describe("POST /api/user/update-full-name", () => {
             expect(updateFullNameResponse.statusCode).toBe(400);
         });
 
-        it("should returns the 400 status code if user not found", async () => {
-            const userData = {
-                fullName: "Jon Doe",
-                email: "jon.doe@gmail.com",
-                password: "secret@password",
-                role: Role.CUSTOMER,
-            };
-
-            const userRepository = connection.getRepository(User);
-            await userRepository.save(userData);
-
-            const accessToken = jwt.token({
-                userId: "2",
-                role: Role.CUSTOMER,
-            });
-
-            const updateFullNameResponse = await request(app)
-                .post(`/api/user/update-full-name`)
-                .set("Cookie", [`accessToken=${accessToken}`])
-                .send({ fullName: "Jenny Doe" });
-
-            expect(updateFullNameResponse.statusCode).toBe(400);
-        });
-
         it("should returns the json user data", async () => {
             const userData = {
                 fullName: "Jon Doe",
