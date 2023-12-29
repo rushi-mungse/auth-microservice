@@ -28,7 +28,7 @@ import {
     permissionMiddleware,
 } from "../middlewares";
 
-import { AppDataSource, logger } from "../config";
+import { AppDataSource, logger, uploadOnCloudinary } from "../config";
 import { Token, User } from "../entity";
 import { CredentialService, TokenService, UserService } from "../services";
 import { Role } from "../constants";
@@ -39,7 +39,7 @@ const router = express.Router();
 const userRepository = AppDataSource.getRepository(User);
 const tokenRepository = AppDataSource.getRepository(Token);
 
-const userService = new UserService(userRepository);
+const userService = new UserService(userRepository, uploadOnCloudinary);
 const tokenService = new TokenService(tokenRepository);
 
 const credentialService = new CredentialService();
