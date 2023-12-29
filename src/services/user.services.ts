@@ -64,6 +64,10 @@ class UserService {
     async getAll() {
         return await this.userRepository.find();
     }
+
+    async deleteUserById(userId: number) {
+        await this.userRepository.delete(userId);
+    }
 }
 
 export default UserService;
