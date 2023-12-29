@@ -5,18 +5,23 @@ import express, {
     RequestHandler,
 } from "express";
 import { UserController } from "../controllers";
-import { checkAccessToken, permissionMiddleware } from "../middlewares";
+import {
+    checkAccessToken,
+    multerMiddleware,
+    permissionMiddleware,
+} from "../middlewares";
 import { UserService } from "../services";
-import { AppDataSource } from "../config";
+import { AppDataSource, uploadOnCloudinary } from "../config";
 import { User } from "../entity";
 import { Role } from "../constants";
 import { IAuthRequest } from "../types";
 import { updateFullNameDataValidator } from "../validators";
+import { UploadApiResponse } from "cloudinary";
 
 const router = express.Router();
 
 const userRespository = AppDataSource.getRepository(User);
-const userService = new UserService(userRespository);
+const userService = new UserService(userRespository, uploadOnCloudinary);
 const userController = new UserController(userService);
 
 router.get(
@@ -59,6 +64,17 @@ router.post(
     ],
     (req: Request, res: Response, next: NextFunction) =>
         userController.updateFullName(
+            req as IAuthRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler,
+);
+
+router.post(
+    "/upload-profile-picture",
+    [checkAccessToken, multerMiddleware.single("avatar")],
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.uploadProfilePicture(
             req as IAuthRequest,
             res,
             next,
