@@ -64,3 +64,10 @@ export interface IForgetPasswordRequest {
 export interface ISetPasswordRequest {
     body: IVerifyOtpData & { password: string; confirmPassword: string };
 }
+
+export interface IUpdateFullNameRequest extends Request {
+    body: {
+        fullName: string;
+    };
+    auth: TPayload;
+}
