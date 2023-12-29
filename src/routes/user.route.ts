@@ -31,6 +31,13 @@ router.get(
         userController.getAll(req, res, next) as unknown as RequestHandler,
 );
 
+router.delete(
+    "/:userId",
+    [checkAccessToken, permissionMiddleware([Role.ADMIN])],
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.delete(req, res, next) as unknown as RequestHandler,
+);
+
 export default router;
 
 /**
