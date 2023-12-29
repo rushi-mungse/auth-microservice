@@ -60,6 +60,10 @@ class UserService {
             password: hashPassword,
         });
     }
+
+    async getAll() {
+        return await this.userRepository.find();
+    }
 }
 
 export default UserService;
