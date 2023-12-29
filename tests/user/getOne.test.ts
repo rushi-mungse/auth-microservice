@@ -40,7 +40,6 @@ describe("GET:user/get/:userId", () => {
                 fullName: "Jon Doe",
                 email: "jon.doe@gmail.com",
                 password: "secret@password",
-                confirmPassword: "secret@password",
                 role: Role.CUSTOMER,
             };
 
@@ -80,7 +79,6 @@ describe("GET:user/get/:userId", () => {
                 fullName: "Jon Doe",
                 email: "jon.doe@gmail.com",
                 password: "secret@password",
-                confirmPassword: "secret@password",
                 role: Role.CUSTOMER,
             };
 
@@ -124,7 +122,6 @@ describe("GET:user/get/:userId", () => {
                 fullName: "Jon Doe",
                 email: "jon.doe@gmail.com",
                 password: "secret@password",
-                confirmPassword: "secret@password",
                 role: Role.CUSTOMER,
             };
 
@@ -164,7 +161,6 @@ describe("GET:user/get/:userId", () => {
                 fullName: "Jon Doe",
                 email: "jon.doe@gmail.com",
                 password: "secret@password",
-                confirmPassword: "secret@password",
                 role: Role.CUSTOMER,
             };
 
@@ -204,7 +200,6 @@ describe("GET:user/get/:userId", () => {
                 fullName: "Jon Doe",
                 email: "jon.doe@gmail.com",
                 password: "secret@password",
-                confirmPassword: "secret@password",
                 role: Role.CUSTOMER,
             };
 
@@ -232,6 +227,19 @@ describe("GET:user/get/:userId", () => {
                 ]);
 
             // assert
+            expect(getUserResponse.statusCode).toBe(400);
+        });
+
+        it("should returns the 400 status code if userId is incorrect", async () => {
+            const adminToken = jwt.token({
+                sub: "1",
+                role: Role.ADMIN,
+            });
+
+            const getUserResponse = await request(app)
+                .get(`/api/user/werwer`)
+                .set("Cookie", [`accessToken=${adminToken}`]);
+
             expect(getUserResponse.statusCode).toBe(400);
         });
     });
