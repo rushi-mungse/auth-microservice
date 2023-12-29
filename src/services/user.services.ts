@@ -1,10 +1,13 @@
 import { User } from "../entity";
 import { Repository } from "typeorm";
 import { IUserData } from "../types";
-import createHttpError from "http-errors";
+import { UploadApiResponse } from "cloudinary";
 
 class UserService {
-    constructor(private userRepository: Repository<User>) {}
+    constructor(
+        private userRepository: Repository<User>,
+        private uploadeOnCloudinary: (T: string) => Promise<UploadApiResponse>,
+    ) {}
 
     /* find user by email */
     async findUserByEmail(email: string) {
@@ -67,6 +70,10 @@ class UserService {
 
     async deleteUserById(userId: number) {
         await this.userRepository.delete(userId);
+    }
+
+    async uploadFile(localFilePath: string) {
+        return await this.uploadeOnCloudinary(localFilePath);
     }
 }
 
