@@ -10,6 +10,8 @@ import { UserService } from "../services";
 import { AppDataSource } from "../config";
 import { User } from "../entity";
 import { Role } from "../constants";
+import { IAuthRequest } from "../types";
+import { updateFullNameDataValidator } from "../validators";
 
 const router = express.Router();
 
@@ -36,6 +38,31 @@ router.delete(
     [checkAccessToken, permissionMiddleware([Role.ADMIN])],
     (req: Request, res: Response, next: NextFunction) =>
         userController.delete(req, res, next) as unknown as RequestHandler,
+);
+
+router.delete(
+    "/",
+    [checkAccessToken],
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.deleteMySelf(
+            req as IAuthRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler,
+);
+
+router.post(
+    "/update-full-name",
+    [
+        updateFullNameDataValidator as unknown as RequestHandler,
+        checkAccessToken,
+    ],
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.updateFullName(
+            req as IAuthRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler,
 );
 
 export default router;
