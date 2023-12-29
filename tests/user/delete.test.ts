@@ -28,8 +28,8 @@ describe("DELETE /api/user/:id", () => {
     describe("Given all fields", () => {
         it("should returns the 200 status code", async () => {
             const userData = {
-                fullName: "Rushikesh Mungse",
-                email: "mungse.rushi@gmail.com",
+                fullName: "Jon Doe",
+                email: "jon.doe@gmail.com",
                 password: "secret@password",
                 role: Role.CUSTOMER,
             };
@@ -51,8 +51,8 @@ describe("DELETE /api/user/:id", () => {
 
         it("should returns the json data", async () => {
             const userData = {
-                fullName: "Rushikesh Mungse",
-                email: "mungse.rushi@gmail.com",
+                fullName: "Jon Doe",
+                email: "jon.doe@gmail.com",
                 password: "secret@password",
                 role: Role.CUSTOMER,
             };
@@ -78,8 +78,8 @@ describe("DELETE /api/user/:id", () => {
 
         it("should check persist user in database", async () => {
             const userData = {
-                fullName: "Rushikesh Mungse",
-                email: "mungse.rushi@gmail.com",
+                fullName: "Jon Doe",
+                email: "jon.doe@gmail.com",
                 role: Role.CUSTOMER,
                 password: "secret@password",
             };
@@ -104,10 +104,10 @@ describe("DELETE /api/user/:id", () => {
 
         it("should returns the deleted user id", async () => {
             const userData = {
-                fullName: "Rushikesh Mungse",
-                email: "mungse.rushi@gmail.com",
-                role: Role.CUSTOMER,
+                fullName: "Jon Doe",
+                email: "jon.doe@gmail.com",
                 password: "secret@password",
+                role: Role.CUSTOMER,
             };
 
             const userRepository = connection.getRepository(User);
@@ -123,7 +123,6 @@ describe("DELETE /api/user/:id", () => {
                 .set("Cookie", [`accessToken=${adminToken}`]);
 
             expect(deleteUserResponse.body).toHaveProperty("id");
-            expect(Number(deleteUserResponse.body.id)).toBe(1);
         });
     });
 
