@@ -71,3 +71,7 @@ export interface IUpdateFullNameRequest extends Request {
     };
     auth: TPayload;
 }
+
+export interface IUploadProfilePictureRequest extends Request {
+    auth: TPayload;
+}
