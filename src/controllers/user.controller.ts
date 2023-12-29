@@ -1,7 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import { UserService } from "../services";
 import createHttpError from "http-errors";
-import { IAuthRequest, IUpdateFullNameRequest } from "../types";
+import {
+    IAuthRequest,
+    IUpdateFullNameRequest,
+    IUploadProfilePictureRequest,
+} from "../types";
 import { validationResult } from "express-validator";
 
 class UserController {
@@ -88,6 +92,36 @@ class UserController {
             return res.json({
                 message: "Update user fullName successfully.",
                 user,
+            });
+        } catch (error) {
+            return next(error);
+        }
+    }
+
+    async uploadProfilePicture(
+        req: IUploadProfilePictureRequest,
+        res: Response,
+        next: NextFunction,
+    ) {
+        const file = req.file;
+        if (!file)
+            return next(createHttpError(400, "Profile picture not found!"));
+
+        const userId = req.auth.userId;
+        try {
+            const user = await this.userService.findUserById(Number(userId));
+            if (!user) return next(createHttpError(400, "User not found!"));
+
+            const uploadFileResponse = await this.userService.uploadFile(
+                file.path,
+            );
+
+            user.avatar = uploadFileResponse.url;
+
+            await this.userService.saveUser(user);
+            return res.json({
+                user,
+                message: "User profile picture updated successfully.",
             });
         } catch (error) {
             return next(error);
