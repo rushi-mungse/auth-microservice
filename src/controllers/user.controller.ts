@@ -1,15 +1,19 @@
 import { Request, Response, NextFunction } from "express";
-import { UserService } from "../services";
+import { CredentialService, UserService } from "../services";
 import createHttpError from "http-errors";
 import {
     IAuthRequest,
+    IChangePasswordRequest,
     IUpdateFullNameRequest,
     IUploadProfilePictureRequest,
 } from "../types";
 import { validationResult } from "express-validator";
 
 class UserController {
-    constructor(private userService: UserService) {}
+    constructor(
+        private userService: UserService,
+        private credentialService: CredentialService,
+    ) {}
 
     async getOne(req: Request, res: Response, next: NextFunction) {
         const userId = req.params.userId;
@@ -122,6 +126,53 @@ class UserController {
             return res.json({
                 user,
                 message: "User profile picture updated successfully.",
+            });
+        } catch (error) {
+            return next(error);
+        }
+    }
+
+    async changePassword(
+        req: IChangePasswordRequest,
+        res: Response,
+        next: NextFunction,
+    ) {
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+            return res.status(400).json({ error: result.array() });
+        }
+        const userId = req.auth.userId;
+        const { newPassword, oldPassword } = req.body;
+
+        let user;
+        try {
+            user = await this.userService.findUserByIdWithPassword(
+                Number(userId),
+            );
+            if (!user) return next(createHttpError(400, "User not found!"));
+
+            const hashPassword = user.password;
+            const isMatch = await this.credentialService.hashCompare(
+                oldPassword,
+                hashPassword,
+            );
+            if (!isMatch)
+                return next(
+                    createHttpError(400, "Old password entered wrong!"),
+                );
+        } catch (error) {
+            return next(error);
+        }
+
+        try {
+            const newHashPassword =
+                await this.credentialService.hashDataUsingBcrypt(newPassword);
+
+            user.password = newHashPassword;
+            await this.userService.saveUser(user);
+            res.json({
+                status: "OK",
+                message: "User password changed successfully",
             });
         } catch (error) {
             return next(error);
