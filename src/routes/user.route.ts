@@ -10,19 +10,22 @@ import {
     multerMiddleware,
     permissionMiddleware,
 } from "../middlewares";
-import { UserService } from "../services";
+import { CredentialService, UserService } from "../services";
 import { AppDataSource, uploadOnCloudinary } from "../config";
 import { User } from "../entity";
 import { Role } from "../constants";
-import { IAuthRequest } from "../types";
-import { updateFullNameDataValidator } from "../validators";
-import { UploadApiResponse } from "cloudinary";
+import { IAuthRequest, IChangePasswordRequest } from "../types";
+import {
+    changePasswordDataValidator,
+    updateFullNameDataValidator,
+} from "../validators";
 
 const router = express.Router();
 
 const userRespository = AppDataSource.getRepository(User);
 const userService = new UserService(userRespository, uploadOnCloudinary);
-const userController = new UserController(userService);
+const credentialService = new CredentialService();
+const userController = new UserController(userService, credentialService);
 
 router.get(
     "/:userId",
@@ -76,6 +79,20 @@ router.post(
     (req: Request, res: Response, next: NextFunction) =>
         userController.uploadProfilePicture(
             req as IAuthRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler,
+);
+
+router.post(
+    "/change-password",
+    [
+        changePasswordDataValidator as unknown as RequestHandler,
+        checkAccessToken,
+    ],
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.changePassword(
+            req as IChangePasswordRequest,
             res,
             next,
         ) as unknown as RequestHandler,
