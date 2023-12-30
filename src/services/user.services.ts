@@ -58,6 +58,21 @@ class UserService {
         });
     }
 
+    async findUserByIdWithPassword(userId: number) {
+        return await this.userRepository.findOne({
+            where: { id: userId },
+            select: [
+                "id",
+                "fullName",
+                "email",
+                "phoneNumber",
+                "role",
+                "avatar",
+                "password",
+            ],
+        });
+    }
+
     async updateUserPassword(userId: number, hashPassword: string) {
         await this.userRepository.update(userId, {
             password: hashPassword,
