@@ -75,3 +75,11 @@ export interface IUpdateFullNameRequest extends Request {
 export interface IUploadProfilePictureRequest extends Request {
     auth: TPayload;
 }
+
+export interface IChangePasswordRequest extends Request {
+    body: {
+        oldPassword: string;
+        newPassword: string;
+    };
+    auth: TPayload;
+}
