@@ -10,4 +10,4 @@ const storage = multer.diskStorage({
     },
 });
 
-export default multer({ storage, limits: { fileSize: 1000000 * 5 } });
+export default multer({ storage, limits: { fileSize: 1000000 * 10 } });
