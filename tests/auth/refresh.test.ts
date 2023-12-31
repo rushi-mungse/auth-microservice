@@ -2,7 +2,6 @@ import request from "supertest";
 import { DataSource } from "typeorm";
 import { AppDataSource } from "../../src/config";
 import app from "../../src/app";
-import { getTokens } from "../utils";
 import createJWKSMock from "mock-jwks";
 import { Role } from "../../src/constants";
 import { Token } from "../../src/entity";
