@@ -8,9 +8,15 @@ import {
     IUploadProfilePictureRequest,
     ISendOtpForChangeEmailRequest,
     IVerifyOtpForChangeEmailRequest,
+    ISendOtpForChangePhoneNumberRequest,
+    IVerifyOtpForChangePhoneNumberRequest,
 } from "../types";
+
 import { validationResult } from "express-validator";
-import { CHANGE_EMAIL_OTP_SECRET } from "../config";
+import {
+    CHANGE_EMAIL_OTP_SECRET,
+    CHANGE_PHONE_NUMBER_OTP_SECRET,
+} from "../config";
 
 class UserController {
     constructor(
@@ -390,6 +396,125 @@ class UserController {
         } catch (error) {
             return next(error);
         }
+    }
+
+    async sendOtpForChangeOldPhoneNumber(
+        req: ISendOtpForChangePhoneNumberRequest,
+        res: Response,
+        next: NextFunction,
+    ) {
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+            return res.status(400).json({ error: result.array() });
+        }
+
+        const userId = req.auth.userId;
+        const { phoneNumber, countryCode } = req.body;
+
+        let user;
+        try {
+            user = await this.userService.findUserById(Number(userId));
+            if (!user) return next(createHttpError(400, "User not found!"));
+            if (user.phoneNumber !== phoneNumber)
+                return next(
+                    createHttpError(400, "User phone number does not match!"),
+                );
+        } catch (error) {
+            return next(error);
+        }
+
+        try {
+            const ttl = 1000 * 60 * 10;
+            const expires = Date.now() + ttl;
+            const otp = this.credentialService.generateOtp();
+
+            // TODO: make notification webhook for send otp for user by email
+
+            const prepareDataForHash = `${otp}.${phoneNumber}.${expires}.${CHANGE_PHONE_NUMBER_OTP_SECRET}`;
+            const hashOtpData =
+                this.credentialService.hashDataUsingCrypto(prepareDataForHash);
+
+            const hashOtp = `${hashOtpData}#${expires}`;
+
+            // FIXME: remove otp from res
+
+            return res.json({
+                otpInfo: {
+                    fullName: user?.fullName,
+                    phoneNumber,
+                    hashOtp,
+                    otp,
+                    countryCode,
+                },
+                message: "Otp send successfully",
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async verifyOtpForChangeOldPhoneNumber(
+        req: IVerifyOtpForChangePhoneNumberRequest,
+        res: Response,
+        next: NextFunction,
+    ) {
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+            return res.status(400).json({ error: result.array() });
+        }
+
+        const userId = req.auth.userId;
+        const { phoneNumber, hashOtp: hashData, otp } = req.body;
+
+        let user;
+        try {
+            user = await this.userService.findUserById(Number(userId));
+            if (!user) return next(createHttpError(400, "User not found!"));
+
+            if (user.phoneNumber !== phoneNumber)
+                return next(createHttpError(400, "Email does not registered!"));
+        } catch (error) {
+            return next(error);
+        }
+
+        try {
+            const [hashOtp, expires] = hashData.split("#");
+            if (Date.now() > +expires) {
+                return next(
+                    createHttpError(408, "Otp expired please resend otp!"),
+                );
+            }
+
+            const prepareDataForHash = `${otp}.${phoneNumber}.${expires}.${CHANGE_PHONE_NUMBER_OTP_SECRET}`;
+            const hashOtpData =
+                this.credentialService.hashDataUsingCrypto(prepareDataForHash);
+
+            if (hashOtpData !== hashOtp)
+                return next(createHttpError(400, "Otp is invalid!"));
+
+            return res.json({
+                isOtpVerified: true,
+                message: "Otp verified successfully.",
+            });
+        } catch (error) {
+            return next(error);
+        }
+    }
+
+    sendOtpForSetNewPhoneNumber(
+        req: ISendOtpForChangePhoneNumberRequest,
+        res: Response,
+        next: NextFunction,
+    ) {
+        return res.json({ ok: true });
+    }
+
+    verifyOtpForSetNewPhoneNumber(
+        req: ISendOtpForChangePhoneNumberRequest,
+        res: Response,
+        next: NextFunction,
+    ) {
+        return res.json({ ok: true });
     }
 }
 
