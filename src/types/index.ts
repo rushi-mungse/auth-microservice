@@ -94,3 +94,24 @@ export interface IVerifyOtpForChangeEmailRequest extends Request {
     body: IVerifyOtpData;
     auth: TPayload;
 }
+
+export interface ISendOtpForChangePhoneNumberRequest extends Request {
+    body: {
+        phoneNumber: string;
+        countryCode: string;
+    };
+    auth: TPayload;
+}
+
+export interface IOtpInfoForPhoneNumber {
+    phoneNumber: string;
+    otp: string;
+    hashOtp: string;
+    fullName: string;
+    countryCode: string;
+}
+
+export interface IVerifyOtpForChangePhoneNumberRequest extends Request {
+    body: IOtpInfoForPhoneNumber;
+    auth: TPayload;
+}
