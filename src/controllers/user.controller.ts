@@ -277,7 +277,115 @@ class UserController {
 
             return res.json({
                 isOtpVerified: true,
-                message: "Otp verified successfuylly.",
+                message: "Otp verified successfully.",
+            });
+        } catch (error) {
+            return next(error);
+        }
+    }
+
+    async sendOtpForChangeEmailToNewEmail(
+        req: ISendOtpForChangeEmailRequest,
+        res: Response,
+        next: NextFunction,
+    ) {
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+            return res.status(400).json({ error: result.array() });
+        }
+
+        const userId = req.auth.userId;
+        const { email } = req.body;
+
+        try {
+            const isExists = await this.userService.findUserByEmail(email);
+            if (isExists)
+                return next(
+                    createHttpError(400, "This email is already registered!"),
+                );
+        } catch (error) {
+            return next(error);
+        }
+
+        let user;
+        try {
+            user = await this.userService.findUserById(Number(userId));
+            if (!user) return next(createHttpError(400, "User not found!"));
+        } catch (error) {
+            next(error);
+        }
+
+        /* generate otp and hash otp */
+        try {
+            const ttl = 1000 * 60 * 10;
+            const expires = Date.now() + ttl;
+            const otp = this.credentialService.generateOtp();
+
+            // TODO: make notification webhook for send otp for user by email
+
+            const prepareDataForHash = `${otp}.${email}.${expires}.${CHANGE_EMAIL_OTP_SECRET}`;
+            const hashOtpData =
+                this.credentialService.hashDataUsingCrypto(prepareDataForHash);
+
+            const hashOtp = `${hashOtpData}#${expires}`;
+
+            // FIXME: remove otp from res
+
+            return res.json({
+                otpInfo: { fullName: user?.fullName, email, hashOtp, otp },
+                message: "Otp send successfully",
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async verifyOtpForChangeEmailByNewEmail(
+        req: IVerifyOtpForChangeEmailRequest,
+        res: Response,
+        next: NextFunction,
+    ) {
+        const result = validationResult(req);
+        if (!result.isEmpty()) {
+            return res.status(400).json({ error: result.array() });
+        }
+
+        const userId = req.auth.userId;
+        const { email, hashOtp: hashData, otp } = req.body;
+
+        let user;
+        try {
+            user = await this.userService.findUserById(Number(userId));
+            if (!user) return next(createHttpError(400, "User not found!"));
+        } catch (error) {
+            return next(error);
+        }
+
+        try {
+            const [hashOtp, expires] = hashData.split("#");
+            if (Date.now() > +expires) {
+                return next(
+                    createHttpError(408, "Otp expired please resend otp!"),
+                );
+            }
+
+            const prepareDataForHash = `${otp}.${email}.${expires}.${CHANGE_EMAIL_OTP_SECRET}`;
+            const hashOtpData =
+                this.credentialService.hashDataUsingCrypto(prepareDataForHash);
+
+            if (hashOtpData !== hashOtp)
+                return next(createHttpError(400, "Otp is invalid!"));
+        } catch (error) {
+            return next(error);
+        }
+
+        try {
+            user.email = email;
+            await this.userService.saveUser(user);
+            return res.json({
+                message: "User email changed successfully",
+                isOtpVerified: true,
+                user,
             });
         } catch (error) {
             return next(error);
