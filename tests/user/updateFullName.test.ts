@@ -6,7 +6,7 @@ import createJwtMock from "mock-jwks";
 import { Role } from "../../src/constants";
 import { User } from "../../src/entity";
 
-describe("POST /api/user/update-full-name", () => {
+describe("[POST] /api/user/update-full-name", () => {
     let connection: DataSource;
     let jwt: ReturnType<typeof createJwtMock>;
 

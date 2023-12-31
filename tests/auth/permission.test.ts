@@ -5,7 +5,7 @@ import app from "../../src/app";
 import createJWKSMock from "mock-jwks";
 import { Role } from "../../src/constants";
 
-describe("GET:auth/permission", () => {
+describe("[GET] auth/permission", () => {
     let connection: DataSource;
     let jwt: ReturnType<typeof createJWKSMock>;
 

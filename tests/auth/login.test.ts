@@ -8,7 +8,7 @@ import { TokenService } from "../../src/services";
 import createJWKSMock from "mock-jwks";
 import { getTokens, isJWT } from "../utils";
 
-describe("POST /api/auth/login", () => {
+describe("[POST] /api/auth/login", () => {
     let connection: DataSource;
     let jwt: ReturnType<typeof createJWKSMock>;
 

@@ -6,7 +6,7 @@ import createJwtMock from "mock-jwks";
 import { Role } from "../../src/constants";
 import { User } from "../../src/entity";
 
-describe("DELETE /api/user/:id", () => {
+describe("[DELETE] /api/user/:id", () => {
     let connection: DataSource;
     let jwt: ReturnType<typeof createJwtMock>;
 

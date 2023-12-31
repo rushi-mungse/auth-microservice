@@ -3,7 +3,7 @@ import app from "../../../src/app";
 import { DataSource } from "typeorm";
 import { AppDataSource } from "../../../src/config";
 
-describe("POST /api/auth/set-password", () => {
+describe("[POST] /api/auth/set-password", () => {
     let connection: DataSource;
     beforeAll(async () => {
         connection = await AppDataSource.initialize();

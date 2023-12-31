@@ -6,7 +6,7 @@ import createJwtMock from "mock-jwks";
 import { Role } from "../../../src/constants";
 import { User } from "../../../src/entity";
 
-describe("GET /api/user/send-otp-for-change-email-by-registered-email", () => {
+describe("[POST] /api/user/send-otp-for-email-change", () => {
     let connection: DataSource;
     let jwt: ReturnType<typeof createJwtMock>;
 
@@ -43,7 +43,7 @@ describe("GET /api/user/send-otp-for-change-email-by-registered-email", () => {
             });
 
             const sendOtpForChangeEmailResponse = await request(app)
-                .post("/api/user/send-otp-for-change-email")
+                .post("/api/user/send-otp-for-email-change")
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .send({ email: "jon.doe@gmail.com" });
 
@@ -67,7 +67,7 @@ describe("GET /api/user/send-otp-for-change-email-by-registered-email", () => {
             });
 
             const sendOtpForChangeEmailResponse = await request(app)
-                .post("/api/user/send-otp-for-change-email")
+                .post("/api/user/send-otp-for-email-change")
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .send({ email: "jon.doe@gmail.com" });
 
@@ -98,7 +98,7 @@ describe("GET /api/user/send-otp-for-change-email-by-registered-email", () => {
             });
 
             const sendOtpForChangeEmailResponse = await request(app)
-                .post("/api/user/send-otp-for-change-email")
+                .post("/api/user/send-otp-for-email-change")
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .send({ email: "jon.doe@gmail.com" });
 
@@ -122,7 +122,7 @@ describe("GET /api/user/send-otp-for-change-email-by-registered-email", () => {
             });
 
             const sendOtpForChangeEmailResponse = await request(app)
-                .post("/api/user/send-otp-for-change-email")
+                .post("/api/user/send-otp-for-email-change")
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .send({ email: "not.match@gmail.com" });
 
@@ -146,7 +146,7 @@ describe("GET /api/user/send-otp-for-change-email-by-registered-email", () => {
             });
 
             const sendOtpForChangeEmailResponse = await request(app)
-                .post("/api/user/send-otp-for-change-email")
+                .post("/api/user/send-otp-for-email-change")
                 .set("Cookie", [`accessToken=${accessToken}`])
                 .send({ email: "jon.doe@gmail.com" });
 
@@ -174,7 +174,7 @@ describe("GET /api/user/send-otp-for-change-email-by-registered-email", () => {
             });
 
             const sendOtpForChangeEmailResponse = await request(app)
-                .post("/api/user/send-otp-for-change-email")
+                .post("/api/user/send-otp-for-email-change")
                 .set("Cookie", [`accessToken=${accessToken}`]);
 
             expect(sendOtpForChangeEmailResponse.statusCode).toBe(400);

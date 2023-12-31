@@ -7,7 +7,7 @@ import { Role } from "./../../../src/constants";
 import { IUserData } from "../../../src/types";
 import { getTokens, isJWT } from "../../utils";
 
-describe("POST:auth/register/verify-otp", () => {
+describe("[POST] auth/register/verify-otp", () => {
     let connection: DataSource;
     beforeAll(async () => {
         connection = await AppDataSource.initialize();

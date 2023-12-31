@@ -5,7 +5,7 @@ import app from "../../../src/app";
 import { User } from "../../../src/entity";
 import { Role } from "./../../../src/constants";
 
-describe("POST:auth/register/send-otp", () => {
+describe("[POST] auth/register/send-otp", () => {
     let connection: DataSource;
     beforeAll(async () => {
         connection = await AppDataSource.initialize();
