@@ -182,4 +182,29 @@ router.post(
         ) as unknown as RequestHandler,
 );
 
+router.post(
+    "/send-otp-for-set-new-phone-number",
+    [phoneNumberDataValidator as unknown as RequestHandler, checkAccessToken],
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.sendOtpForSetNewPhoneNumber(
+            req as ISendOtpForChangePhoneNumberRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler,
+);
+
+router.post(
+    "/verify-otp-for-set-new-phone-number",
+    [
+        verifyOtpForChangePhoneNumberDataValidator as unknown as RequestHandler,
+        checkAccessToken,
+    ],
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.verifyOtpForSetNewPhoneNumber(
+            req as IVerifyOtpForChangePhoneNumberRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler,
+);
+
 export default router;
