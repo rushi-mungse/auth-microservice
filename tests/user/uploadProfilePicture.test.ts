@@ -7,7 +7,7 @@ import { Role } from "../../src/constants";
 import { User } from "../../src/entity";
 import path from "path";
 
-describe.skip("POST /api/user/upload-profile-picture", () => {
+describe("POST /api/user/upload-profile-picture", () => {
     let connection: DataSource;
     let jwt: ReturnType<typeof createJwtMock>;
 
