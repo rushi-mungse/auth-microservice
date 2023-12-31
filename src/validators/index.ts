@@ -5,3 +5,6 @@ export { default as forgetPasswordDataValidator } from "./auth/forgetPasswordDat
 export { default as setPasswordDataValidator } from "./auth/setPasswordData.validator";
 export { default as updateFullNameDataValidator } from "./user/updateFullNameData.validator";
 export { default as changePasswordDataValidator } from "./user/changePasswordData.validator";
+export { default as phoneNumberDataValidator } from "./user/phoneNumberData.validator";
+export { default as verifyOtpForChangePhoneNumberDataValidator } from "./user/verifyOtpForChangePhoneNumberData.validator";
+export { default as emailValidator } from "./user/email.validator";
