@@ -106,7 +106,7 @@ router.post(
 );
 
 router.post(
-    "/send-otp-for-change-email",
+    "/send-otp-for-email-change",
     [emailValidator as unknown as RequestHandler, checkAccessToken],
     (req: Request, res: Response, next: NextFunction) =>
         userController.sendOtpForChangeEmail(
@@ -117,10 +117,32 @@ router.post(
 );
 
 router.post(
-    "/verify-otp-for-change-email",
+    "/verify-otp-for-email-change",
     [verifyOtpDataValidator as unknown as RequestHandler, checkAccessToken],
     (req: Request, res: Response, next: NextFunction) =>
         userController.verifyOtpForChangeEmail(
+            req as IVerifyOtpForChangeEmailRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler,
+);
+
+router.post(
+    "/send-otp-to-new-email-for-email-change",
+    [emailValidator as unknown as RequestHandler, checkAccessToken],
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.sendOtpForChangeEmailToNewEmail(
+            req as ISendOtpForChangeEmailRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler,
+);
+
+router.post(
+    "/verify-new-email-for-email-change",
+    [verifyOtpDataValidator as unknown as RequestHandler, checkAccessToken],
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.verifyOtpForChangeEmailByNewEmail(
             req as IVerifyOtpForChangeEmailRequest,
             res,
             next,
