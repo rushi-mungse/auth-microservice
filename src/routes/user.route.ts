@@ -4,28 +4,36 @@ import express, {
     NextFunction,
     RequestHandler,
 } from "express";
-import { UserController } from "../controllers";
+
 import {
     checkAccessToken,
     multerMiddleware,
     permissionMiddleware,
 } from "../middlewares";
-import { CredentialService, UserService } from "../services";
-import { AppDataSource, uploadOnCloudinary } from "../config";
-import { User } from "../entity";
-import { Role } from "../constants";
+
 import {
     IAuthRequest,
     IChangePasswordRequest,
     ISendOtpForChangeEmailRequest,
+    ISendOtpForChangePhoneNumberRequest,
     IVerifyOtpForChangeEmailRequest,
+    IVerifyOtpForChangePhoneNumberRequest,
 } from "../types";
+
 import {
     changePasswordDataValidator,
+    phoneNumberDataValidator,
     updateFullNameDataValidator,
     verifyOtpDataValidator,
+    verifyOtpForChangePhoneNumberDataValidator,
+    emailValidator,
 } from "../validators";
-import emailValidator from "../validators/user/email.validator";
+
+import { UserController } from "../controllers";
+import { CredentialService, UserService } from "../services";
+import { AppDataSource, uploadOnCloudinary } from "../config";
+import { User } from "../entity";
+import { Role } from "../constants";
 
 const router = express.Router();
 
@@ -144,6 +152,31 @@ router.post(
     (req: Request, res: Response, next: NextFunction) =>
         userController.verifyOtpForChangeEmailByNewEmail(
             req as IVerifyOtpForChangeEmailRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler,
+);
+
+router.post(
+    "/send-otp-for-change-old-phone-number",
+    [phoneNumberDataValidator as unknown as RequestHandler, checkAccessToken],
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.sendOtpForChangeOldPhoneNumber(
+            req as ISendOtpForChangePhoneNumberRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler,
+);
+
+router.post(
+    "/verify-otp-for-change-old-phone-number",
+    [
+        verifyOtpForChangePhoneNumberDataValidator as unknown as RequestHandler,
+        checkAccessToken,
+    ],
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.verifyOtpForChangeOldPhoneNumber(
+            req as IVerifyOtpForChangePhoneNumberRequest,
             res,
             next,
         ) as unknown as RequestHandler,
