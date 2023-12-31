@@ -83,3 +83,14 @@ export interface IChangePasswordRequest extends Request {
     };
     auth: TPayload;
 }
+export interface ISendOtpForChangeEmailRequest extends Request {
+    body: {
+        email: string;
+    };
+    auth: TPayload;
+}
+
+export interface IVerifyOtpForChangeEmailRequest extends Request {
+    body: IVerifyOtpData;
+    auth: TPayload;
+}
