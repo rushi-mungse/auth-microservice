@@ -21,6 +21,7 @@ export const {
     CLOUDINARY_API_KEY,
     CLOUDINARY_API_SECRET,
     CHANGE_EMAIL_OTP_SECRET,
+    CHANGE_PHONE_NUMBER_OTP_SECRET,
 } = process.env;
 
 export { default as logger } from "./logger";
