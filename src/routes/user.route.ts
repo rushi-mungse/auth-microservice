@@ -14,11 +14,18 @@ import { CredentialService, UserService } from "../services";
 import { AppDataSource, uploadOnCloudinary } from "../config";
 import { User } from "../entity";
 import { Role } from "../constants";
-import { IAuthRequest, IChangePasswordRequest } from "../types";
+import {
+    IAuthRequest,
+    IChangePasswordRequest,
+    ISendOtpForChangeEmailRequest,
+    IVerifyOtpForChangeEmailRequest,
+} from "../types";
 import {
     changePasswordDataValidator,
     updateFullNameDataValidator,
+    verifyOtpDataValidator,
 } from "../validators";
+import emailValidator from "../validators/user/email.validator";
 
 const router = express.Router();
 
@@ -98,15 +105,26 @@ router.post(
         ) as unknown as RequestHandler,
 );
 
-export default router;
+router.post(
+    "/send-otp-for-change-email",
+    [emailValidator as unknown as RequestHandler, checkAccessToken],
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.sendOtpForChangeEmail(
+            req as ISendOtpForChangeEmailRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler,
+);
 
-/**
- * User End Points
- *      - get('/:id)
- *      - upload user photo
- *      - update user
- *      - change email
- *      - change phone number
- *      - get all users
- *      - delete user
- */
+router.post(
+    "/verify-otp-for-change-email",
+    [verifyOtpDataValidator as unknown as RequestHandler, checkAccessToken],
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.verifyOtpForChangeEmail(
+            req as IVerifyOtpForChangeEmailRequest,
+            res,
+            next,
+        ) as unknown as RequestHandler,
+);
+
+export default router;
