@@ -56,12 +56,7 @@ class UserController {
         try {
             const user = await this.userService.findUserById(Number(userId));
             if (!user) return next(createHttpError(400, "User not found!"));
-
             await this.userService.deleteUserById(Number(userId));
-
-            res.clearCookie("accessToken");
-            res.clearCookie("refreshToken");
-
             return res.json({ id: userId });
         } catch (error) {
             return next(error);
