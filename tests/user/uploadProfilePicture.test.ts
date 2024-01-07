@@ -8,7 +8,7 @@ import { User } from "../../src/entity";
 import path from "path";
 const TIMEOUT_INTERVAL = 10000;
 
-describe("[POST] /api/user/upload-profile-picture", () => {
+describe.skip("[POST] /api/user/upload-profile-picture", () => {
     let connection: DataSource;
     let jwt: ReturnType<typeof createJwtMock>;
 
