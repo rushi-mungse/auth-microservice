@@ -214,21 +214,16 @@ class UserController {
             next(error);
         }
 
-        /* generate otp and hash otp */
         try {
             const ttl = 1000 * 60 * 10;
             const expires = Date.now() + ttl;
             const otp = this.credentialService.generateOtp();
-
-            // TODO: make notification webhook for send otp for user by email
 
             const prepareDataForHash = `${otp}.${email}.${expires}.${CHANGE_EMAIL_OTP_SECRET}`;
             const hashOtpData =
                 this.credentialService.hashDataUsingCrypto(prepareDataForHash);
 
             const hashOtp = `${hashOtpData}#${expires}`;
-
-            // FIXME: remove otp from res
 
             return res.json({
                 otpInfo: { fullName: user?.fullName, email, hashOtp, otp },
@@ -318,21 +313,16 @@ class UserController {
             next(error);
         }
 
-        /* generate otp and hash otp */
         try {
             const ttl = 1000 * 60 * 10;
             const expires = Date.now() + ttl;
             const otp = this.credentialService.generateOtp();
-
-            // TODO: make notification webhook for send otp for user by email
 
             const prepareDataForHash = `${otp}.${email}.${expires}.${CHANGE_EMAIL_OTP_SECRET}`;
             const hashOtpData =
                 this.credentialService.hashDataUsingCrypto(prepareDataForHash);
 
             const hashOtp = `${hashOtpData}#${expires}`;
-
-            // FIXME: remove otp from res
 
             return res.json({
                 otpInfo: { fullName: user?.fullName, email, hashOtp, otp },
@@ -425,15 +415,11 @@ class UserController {
             const expires = Date.now() + ttl;
             const otp = this.credentialService.generateOtp();
 
-            // TODO: make notification webhook for send otp for user by email
-
             const prepareDataForHash = `${otp}.${phoneNumber}.${expires}.${CHANGE_PHONE_NUMBER_OTP_SECRET}`;
             const hashOtpData =
                 this.credentialService.hashDataUsingCrypto(prepareDataForHash);
 
             const hashOtp = `${hashOtpData}#${expires}`;
-
-            // FIXME: remove otp from res
 
             return res.json({
                 otpInfo: {
@@ -524,15 +510,11 @@ class UserController {
             const expires = Date.now() + ttl;
             const otp = this.credentialService.generateOtp();
 
-            // TODO: make notification webhook for send otp for user by email
-
             const prepareDataForHash = `${otp}.${phoneNumber}.${expires}.${CHANGE_PHONE_NUMBER_OTP_SECRET}`;
             const hashOtpData =
                 this.credentialService.hashDataUsingCrypto(prepareDataForHash);
 
             const hashOtp = `${hashOtpData}#${expires}`;
-
-            // FIXME: remove otp from res
 
             return res.json({
                 otpInfo: {
@@ -612,7 +594,6 @@ class UserController {
 
         const { fullName, email, password, confirmPassword, role } = req.body;
 
-        // check comfirm password and password is match
         if (password !== confirmPassword) {
             const err = createHttpError(
                 400,
@@ -621,7 +602,6 @@ class UserController {
             return next(err);
         }
 
-        /* check email already registered */
         try {
             const user = await this.userService.findUserByEmail(email);
             if (user) {
@@ -633,7 +613,6 @@ class UserController {
             return next(error);
         }
 
-        /* hash password and hash otp*/
         try {
             const hashPassword =
                 await this.credentialService.hashDataUsingBcrypt(password);
@@ -642,15 +621,11 @@ class UserController {
             const expires = Date.now() + ttl;
             const otp = this.credentialService.generateOtp();
 
-            // TODO: make notification webhook for send otp for user by email
-
             const prepareDataForHash = `${otp}.${email}.${expires}.${hashPassword}`;
             const hashOtpData =
                 this.credentialService.hashDataUsingCrypto(prepareDataForHash);
 
             const hashOtp = `${hashOtpData}#${expires}#${hashPassword}`;
-
-            // FIXME: remove otp from res
 
             return res.json({ fullName, email, hashOtp, otp, role });
         } catch (error) {
@@ -663,7 +638,6 @@ class UserController {
         res: Response,
         next: NextFunction,
     ) {
-        /*  Validate SendOtpData from user [fullName, email, otp, hashOtp] */
         const result = validationResult(req);
         if (!result.isEmpty()) {
             return res.status(400).json({ error: result.array() });
@@ -671,7 +645,6 @@ class UserController {
 
         const { fullName, email, otp, hashOtp, role } = req.body;
 
-        /* check email already registered */
         try {
             const user = await this.userService.findUserByEmail(email);
             if (user) {
@@ -683,13 +656,11 @@ class UserController {
             return next(error);
         }
 
-        // check hash otp is valid
         if (hashOtp.split("#").length !== 3) {
             const error = createHttpError(400, "Otp is invalid!");
             return next(error);
         }
 
-        // verify otp and hash otp
         const [prevHashedOtp, expires, hashPassword] = hashOtp.split("#");
         try {
             if (Date.now() > +expires) {
@@ -697,7 +668,6 @@ class UserController {
                 return next(error);
             }
 
-            // prepare hash data
             const prepareDataForHash = `${otp}.${email}.${expires}.${hashPassword}`;
             const hashOtpData =
                 this.credentialService.hashDataUsingCrypto(prepareDataForHash);
@@ -710,7 +680,6 @@ class UserController {
             return next(error);
         }
 
-        // register user
         let user;
         try {
             user = await this.userService.saveUser({

@@ -6,7 +6,7 @@ import { JWKS_URI } from "../config";
 
 export default expressjwt({
     secret: jwksClient.expressJwtSecret({
-        jwksUri: JWKS_URI!,
+        jwksUri: JWKS_URI ?? "",
         cache: true,
         rateLimit: true,
     }) as GetVerificationKey,

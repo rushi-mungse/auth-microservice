@@ -6,16 +6,16 @@ import { Token } from "../entity";
 
 /* validate refresh token and check if revoked refresh token */
 export default expressjwt({
-    secret: REFRESH_TOKEN_SECRET!,
+    secret: REFRESH_TOKEN_SECRET ?? "",
     algorithms: ["HS256"],
     getToken(req: Request) {
         const { refreshToken } = req.cookies as IAuthCookie;
         return refreshToken;
     },
     async isRevoked(req: Request, token) {
-        const payload = token?.payload as TPayload;
+        if (!token) return true;
+        const payload = token.payload as TPayload;
         try {
-            /* check refresh token is in db */
             const tokenRepository = AppDataSource.getRepository(Token);
             const tokenRef = await tokenRepository.findOne({
                 where: {
