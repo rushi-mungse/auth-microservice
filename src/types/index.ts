@@ -115,3 +115,23 @@ export interface IVerifyOtpForChangePhoneNumberRequest extends Request {
     body: IOtpInfoForPhoneNumber;
     auth: TPayload;
 }
+
+export interface ISendOtpToUserRegister extends Request {
+    body: {
+        fullName: string;
+        email: string;
+        password: string;
+        confirmPassword: string;
+        role: "admin" | "customer" | "manager";
+    };
+}
+
+export interface IVerifyOtpUserRegister extends Request {
+    body: {
+        fullName: string;
+        email: string;
+        hashOtp: string;
+        otp: string;
+        role: "admin" | "customer" | "manager";
+    };
+}
