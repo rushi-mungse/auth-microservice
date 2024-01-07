@@ -211,6 +211,7 @@ router.post(
 router.post(
     "/register/send-otp",
     sendOtpDataValidator,
+    [checkAccessToken, permissionMiddleware([Role.ADMIN])],
     (req: Request, res: Response, next: NextFunction) =>
         userController.sendOtp(req, res, next) as unknown as RequestHandler,
 );
@@ -218,6 +219,7 @@ router.post(
 router.post(
     "/register/verify-otp",
     verifyOtpDataValidatorForUser,
+    [checkAccessToken, permissionMiddleware([Role.ADMIN])],
     (req: Request, res: Response, next: NextFunction) =>
         userController.verifyOtp(req, res, next) as unknown as RequestHandler,
 );
