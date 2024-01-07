@@ -34,7 +34,8 @@ import { CredentialService, UserService } from "../services";
 import { AppDataSource, uploadOnCloudinary } from "../config";
 import { User } from "../entity";
 import { Role } from "../constants";
-
+import sendOtpDataValidator from "../validators/user/sendOtpData.validator";
+import verifyOtpDataValidatorForUser from "../validators/user/verifyOtpData.validator";
 const router = express.Router();
 
 const userRespository = AppDataSource.getRepository(User);
@@ -205,6 +206,20 @@ router.post(
             res,
             next,
         ) as unknown as RequestHandler,
+);
+
+router.post(
+    "/register/send-otp",
+    sendOtpDataValidator,
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.sendOtp(req, res, next) as unknown as RequestHandler,
+);
+
+router.post(
+    "/register/verify-otp",
+    verifyOtpDataValidatorForUser,
+    (req: Request, res: Response, next: NextFunction) =>
+        userController.verifyOtp(req, res, next) as unknown as RequestHandler,
 );
 
 export default router;
