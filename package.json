@@ -4,6 +4,7 @@
   "description": "This is authentication microservice.",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "dev": "cross-env NODE_ENV=dev nodemon src/server.ts",
     "formate:fix": "prettier . --write",
     "formate:check": "prettier . --check",
